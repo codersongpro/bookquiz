@@ -344,8 +344,14 @@ body {
 }
 
 .reading-content strong {
-  background: linear-gradient(to top, #ffeaa7 40%, transparent 40%); /* 단어 하이라이트 */
-  padding: 2px 4px;
+  background-color: #ffeaa7; /* 화사하고 부드러운 노란색 형광펜 배경 */
+  color: #d35400;            /* 눈에 잘 띄는 오렌지 브라운 텍스트 색상 */
+  padding: 2px 8px;
+  border-radius: 8px;        /* 둥글둥글한 모서리 */
+  font-weight: 900;          /* 글씨 두께를 굵게 강조 */
+  border-bottom: 2px solid #f39c12; /* 하단 얇은 오렌지 포인트 라인 */
+  display: inline-block;
+  margin: 0 2px;
 }
 
 /* 9. 퀴즈 화면 스타일 */

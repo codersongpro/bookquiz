@@ -10,6 +10,8 @@ let currentDay = 1;              // 현재 학습/퀴즈를 진행 중인 날짜
 let currentQuestionIndex = 0;    // 현재 풀고 있는 문제 번호 (0 ~ 9)
 let currentScore = 0;            // 현재 맞힌 문제 개수 기준 점수 (개당 10점, 최대 100점)
 let activeDayData = null;        // 현재 일차의 데이터 개체 (읽을거리 및 퀴즈들)
+let currentShuffledChoices = [];  // 현재 셔플된 객관식 보기 배열
+let currentShuffledAnswerIndex = 0; // 현재 셔플된 보기 중 정답 인덱스
 
 // 2. DOM 요소 선택 (자주 사용하는 화면 요소를 미리 가져옴)
 const views = {
@@ -232,9 +234,23 @@ function showQuestion() {
     choiceBox.style.display = 'flex';
     shortBox.style.display = 'none';
 
+    // 보기 셔플 및 정답 인덱스 맵핑
+    const originalChoices = currentQuiz.choices;
+    const correctAnswerText = originalChoices[currentQuiz.answer];
+
+    // 배열 복사 후 셔플 (Fisher-Yates 알고리즘)
+    currentShuffledChoices = [...originalChoices];
+    for (let i = currentShuffledChoices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [currentShuffledChoices[i], currentShuffledChoices[j]] = [currentShuffledChoices[j], currentShuffledChoices[i]];
+    }
+
+    // 셔플된 보기 속에서 새로운 정답 인덱스 찾기
+    currentShuffledAnswerIndex = currentShuffledChoices.indexOf(correctAnswerText);
+
     const choiceButtons = choiceBox.querySelectorAll('.choice-btn');
     choiceButtons.forEach((btn, idx) => {
-      btn.innerText = `${idx + 1}. ${currentQuiz.choices[idx]}`;
+      btn.innerText = `${idx + 1}. ${currentShuffledChoices[idx]}`;
       btn.className = 'choice-btn'; // 스타일 초기화
       btn.disabled = false;         // 버튼 활성화
 
@@ -275,7 +291,8 @@ function checkChoiceAnswer(selectedIndex, clickedButton) {
     btn.disabled = true;
   });
 
-  const isCorrect = (selectedIndex === currentQuiz.answer);
+  // 셔플된 정답 인덱스와 유저가 누른 인덱스 비교
+  const isCorrect = (selectedIndex === currentShuffledAnswerIndex);
 
   if (isCorrect) {
     clickedButton.classList.add('selected');
@@ -288,8 +305,8 @@ function checkChoiceAnswer(selectedIndex, clickedButton) {
     clickedButton.style.backgroundColor = '#ffe9e9'; // 오답 붉은색 피드백
     clickedButton.style.borderColor = 'var(--accent-color)';
     // 정답인 버튼도 녹색으로 함께 강조해 줌
-    buttons[currentQuiz.answer].style.borderColor = 'var(--secondary-color)';
-    buttons[currentQuiz.answer].style.backgroundColor = '#e8f5e9';
+    buttons[currentShuffledAnswerIndex].style.borderColor = 'var(--secondary-color)';
+    buttons[currentShuffledAnswerIndex].style.backgroundColor = '#e8f5e9';
     showFeedback(false, currentQuiz.explanation);
   }
 }
