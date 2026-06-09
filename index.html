@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>지안이의 독서 골든벨! 위인전 & 독도 22일 학습</title>
+  <meta name="description" content="지안이 친구를 위한 한국을 빛낸 위인전 및 독도 관련 도서 예상 퀴즈 서비스입니다. 매일 10문제씩 22일간 재미있게 풀어보세요.">
+  <!-- 구글 폰트(Outfit & Nanum Gothic) 적용 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <!-- CSS 스타일 연동 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 전체 레이아웃 컨테이너 -->
+  <div id="app-container">
+    
+    <!-- 공통 헤더 영역 -->
+    <header id="main-header">
+      <div class="logo-area">
+        <span class="bell-emoji">🔔</span>
+        <h1 id="app-title">지안이의 독서 골든벨</h1>
+      </div>
+      <div id="header-subtitle">지안이를 위한 위인전과 독도 이야기</div>
+    </header>
+
+    <!-- 메인 콘텐츠 영역 (SPA 화면 전환 대상) -->
+    <main id="main-content">
+
+      <!-- ================= 홈 화면 (대시보드) ================= -->
+      <section id="home-view" class="view-section active">
+        <div class="intro-box">
+          <h2>반가워요, 지안이 친구! 👋</h2>
+          <p class="intro-text">
+            매일 재미있는 <strong>위인전 이야기</strong>와 <strong>독도 이야기</strong>를 읽고 퀴즈를 풀어보세요.<br>
+            22일 동안 매일 10문제를 풀며 멋진 골든벨 왕관을 얻어봐요!
+          </p>
+          <button id="btn-reset-data" class="secondary-btn">진도 초기화하기 🔄</button>
+        </div>
+
+        <div class="dashboard-title">
+          <h3>📅 22일 골든벨 도전 달력</h3>
+        </div>
+
+        <!-- 22일 카드 격자 레이아웃 -->
+        <div id="days-grid" class="days-grid">
+          <!-- JS에서 동적으로 22개의 카드를 생성합니다. -->
+        </div>
+      </section>
+
+      <!-- ================= 읽을거리 화면 ================= -->
+      <section id="reading-view" class="view-section">
+        <div class="navigation-bar">
+          <button id="btn-reading-back" class="nav-back-btn">⬅️ 처음으로</button>
+          <div id="reading-day-badge" class="day-badge">Day 1</div>
+        </div>
+
+        <h2 id="reading-title" class="section-title">오늘의 읽을거리</h2>
+
+        <div class="reading-container">
+          <!-- 위인 이야기 카드 -->
+          <article class="reading-card hero-card">
+            <div class="card-header">
+              <span class="card-icon">👑</span>
+              <h3>오늘의 위인 이야기</h3>
+            </div>
+            <p id="reading-hero-text" class="reading-content">
+              <!-- 위인 이야기가 표시되는 곳 -->
+            </p>
+          </article>
+
+          <!-- 독도 이야기 카드 -->
+          <article class="reading-card dokdo-card">
+            <div class="card-header">
+              <span class="card-icon">🏝️</span>
+              <h3>오늘의 독도 이야기</h3>
+            </div>
+            <p id="reading-dokdo-text" class="reading-content">
+              <!-- 독도 이야기가 표시되는 곳 -->
+            </p>
+          </article>
+        </div>
+
+        <div class="action-area">
+          <button id="btn-start-quiz" class="primary-btn pulse-animation">
+            📖 다 읽었어요! 퀴즈 풀기 ➡️
+          </button>
+        </div>
+      </section>
+
+      <!-- ================= 퀴즈 화면 ================= -->
+      <section id="quiz-view" class="view-section">
+        <!-- 퀴즈 상태 표시 헤더 -->
+        <div class="quiz-header">
+          <div class="quiz-progress-wrapper">
+            <span id="quiz-progress-text">문제 1 / 10</span>
+            <div class="progress-bar-bg">
+              <div id="quiz-progress-fill" class="progress-bar-fill" style="width: 10%;"></div>
+            </div>
+          </div>
+          <div class="quiz-score-badge">
+            점수: <span id="current-score">0</span>점
+          </div>
+        </div>
+
+        <!-- 퀴즈 출제 카드 -->
+        <div class="quiz-card">
+          <!-- 퀴즈 분류 태그 (위인 / 독도) -->
+          <div id="quiz-category-tag" class="category-tag">위인전 문제</div>
+
+          <!-- 문제 지문 -->
+          <h3 id="quiz-question-text" class="question-text">
+            문제가 들어갈 자리입니다.
+          </h3>
+
+          <!-- [1] 객관식 보기 영역 -->
+          <div id="choice-container" class="choice-container">
+            <button class="choice-btn" data-index="0">1. 보기 1</button>
+            <button class="choice-btn" data-index="1">2. 보기 2</button>
+            <button class="choice-btn" data-index="2">3. 보기 3</button>
+            <button class="choice-btn" data-index="3">4. 보기 4</button>
+          </div>
+
+          <!-- [2] 주관식 초성 입력 영역 -->
+          <div id="short-answer-container" class="short-answer-container">
+            <div class="hint-box">
+              <span class="hint-label">초성 힌트:</span>
+              <span id="quiz-hint-text" class="hint-letters">ㄱㅈㅅ</span>
+            </div>
+            <div class="input-row">
+              <input type="text" id="quiz-input-answer" class="quiz-input" placeholder="정답을 직접 적어주세요!" autocomplete="off">
+              <button id="btn-submit-answer" class="primary-btn">확인 ➡️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 퀴즈 피드백 영역 (정답/오답 확인 및 해설) -->
+        <div id="quiz-feedback" class="quiz-feedback-card">
+          <div class="feedback-status">
+            <span id="feedback-icon" class="feedback-icon">⭕</span>
+            <span id="feedback-message" class="feedback-message">정답입니다! 참 잘했어요!</span>
+          </div>
+          <div class="feedback-explanation">
+            <strong>💡 알아두기:</strong>
+            <p id="feedback-explanation-text">정답 해설 내용이 표시됩니다.</p>
+          </div>
+          <button id="btn-next-quiz" class="primary-btn">다음 문제로 ➡️</button>
+        </div>
+      </section>
+
+      <!-- ================= 결과 화면 ================= -->
+      <section id="result-view" class="view-section">
+        <div class="result-card">
+          <h2 class="result-main-title">🎖️ 오늘의 골든벨 결과 🎖️</h2>
+          <div id="result-day-text" class="result-day-text">Day 1 도전 완료!</div>
+
+          <!-- 메달 시각적 효과 -->
+          <div class="medal-display">
+            <div id="result-medal-icon" class="medal-icon">🥇</div>
+            <div id="result-medal-name" class="medal-name">골든벨 금메달</div>
+          </div>
+
+          <!-- 점수 정보 -->
+          <div class="score-display">
+            <div class="score-number"><span id="result-score-text">100</span> / 100</div>
+            <p id="result-comment" class="result-comment">우와! 모든 문제를 다 맞혔어요! 당신은 진정한 골든벨 대장!</p>
+          </div>
+
+          <!-- 버튼 컨트롤 -->
+          <div class="result-actions">
+            <button id="btn-restart-day" class="secondary-btn">다시 풀기 🔄</button>
+            <button id="btn-go-home" class="primary-btn">학습 목록으로 🏠</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- 공통 푸터 영역 -->
+    <footer id="main-footer">
+      <p>© 2026 초등 독서 골든벨. 위인전과 독도를 사랑하는 마음으로 만듦.</p>
+    </footer>
+
+  </div>
+
+  <!-- 데이터 및 비즈니스 로직 스크립트 연결 -->
+  <script src="quiz-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
