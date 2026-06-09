@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>지안이의 독서 골든벨! 위인전 & 독도 22일 학습</title>
-  <meta name="description" content="지안이 친구를 위한 한국을 빛낸 위인전 및 독도 관련 도서 예상 퀴즈 서비스입니다. 매일 10문제씩 22일간 재미있게 풀어보세요.">
+  <title>지안이를 위한 골든벨 퀴즈 연습</title>
+  <meta name="description" content="지안이를 위한 한국을 빛낸 위인전 및 독도 골든벨 퀴즈 연습 공간입니다. 매일 10문제씩 22일간 재미있게 풀어보세요.">
   <!-- 구글 폰트(Outfit & Nanum Gothic) 적용 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,9 +21,9 @@
     <header id="main-header">
       <div class="logo-area">
         <span class="bell-emoji">🔔</span>
-        <h1 id="app-title">지안이의 독서 골든벨</h1>
+        <h1 id="app-title">지안이를 위한 골든벨 퀴즈 연습</h1>
       </div>
-      <div id="header-subtitle">지안이를 위한 위인전과 독도 이야기</div>
+      <div id="header-subtitle">재미있는 위인전과 독도 퀴즈 연습하기</div>
     </header>
 
     <!-- 메인 콘텐츠 영역 (SPA 화면 전환 대상) -->
@@ -32,12 +32,62 @@
       <!-- ================= 홈 화면 (대시보드) ================= -->
       <section id="home-view" class="view-section active">
         <div class="intro-box">
-          <h2>반가워요, 지안이 친구! 👋</h2>
+          <h2>반가워요, 지안이! 👋</h2>
           <p class="intro-text">
-            매일 재미있는 <strong>위인전 이야기</strong>와 <strong>독도 이야기</strong>를 읽고 퀴즈를 풀어보세요.<br>
-            22일 동안 매일 10문제를 풀며 멋진 골든벨 왕관을 얻어봐요!
+            이곳은 지안이를 위한 <strong>독서 골든벨 퀴즈 연습</strong> 공간이에요.<br>
+            매일 흥미진진한 위인 동화와 독도 이야기를 읽고 퀴즈를 풀어보세요. 멋진 골든벨 왕관이 지안이를 기다리고 있어요!
           </p>
           <button id="btn-reset-data" class="secondary-btn">진도 초기화하기 🔄</button>
+        </div>
+
+        <!-- 노래 가사 아코디언 -->
+        <div class="lyrics-box">
+          <details>
+            <summary>🎵 '한국을 빛낸 100명의 위인들' 노래 가사</summary>
+            <div class="lyrics-content">
+              <div class="lyrics-verse">
+                <h4>1절</h4>
+                <p>아름다운 이 땅에 금수강산에 단군 할아버지가 터 잡으시고
+                홍익인간 뜻으로 나라 세우니 대대손손 훌륭한 인물도 많아
+                고구려 세운 동명왕 백제 온조왕 알에서 나온 혁거세
+                만주벌판 달려라 광개토대왕 신라 장군 이사부
+                백결선생 떡방아 삼천궁녀 의자왕
+                황산벌의 계백 맞서 싸운 관창 역사는 흐른다</p>
+              </div>
+              <div class="lyrics-verse">
+                <h4>2절</h4>
+                <p>말 목 자른 김유신 통일 문무왕 원효대사 해골물 혜초 왕오천축국전
+                발해 세운 대조영 귀주대첩 강감찬 서희 장군 담판 외교
+                무신정권 정중부 화포 최무선 죽림칠현 김부식
+                지눌수선사 조계종 의천 천태종 삼국유사 일연
+                역사는 흐른다</p>
+              </div>
+              <div class="lyrics-verse">
+                <h4>3절</h4>
+                <p>황금을 보기를 돌 같이 하라 최영 장군의 그 말씀 받들자
+                황희 정승 맹사성 과학 장영실 신기전과 화차 이종무
+                한글 창제 세종대왕 집현전 학자들 사육신과 생육신
+                몸 바쳐서 지켰네 남이 장군 충무공 이순신
+                역사는 흐른다</p>
+              </div>
+              <div class="lyrics-verse">
+                <h4>4절</h4>
+                <p>선조때 임진왜란 의병장 곽재우 행주치마 권율 삼학사
+                사명대사 외교 논개 의암 절개 한석봉과 그의 어머니
+                단원 김홍도 풍속화 혜원 신윤복 김삿갓 방랑 시인
+                대동여지도 김정호 영조 임금 탕평책 정조 규장각
+                역사는 흐른다</p>
+              </div>
+              <div class="lyrics-verse">
+                <h4>5절</h4>
+                <p>조선 말기 대원군 명성황후 척화비 신돌석과 의병들 안중근은 애국
+                이준 특사 헤이그 유관순 누나 동양평화 안창호
+                한글 수호 주시경 무궁화 남궁억 만해 스님 한용운
+                어린이날 방정환 청산리 김좌진 윤봉길은 도시락
+                역사는 흐른다</p>
+              </div>
+            </div>
+          </details>
         </div>
 
         <div class="dashboard-title">

@@ -691,3 +691,111 @@ body {
     flex: 1;
   }
 }
+
+/* ==========================================================================
+   노래 가사 아코디언 스타일
+   ========================================================================== */
+.lyrics-box {
+  margin-top: 10px;
+  margin-bottom: 25px;
+  background-color: #ffffff;
+  border: 3px solid var(--primary-light);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(245, 176, 65, 0.1);
+  transition: border-color 0.3s ease;
+}
+
+.lyrics-box:hover {
+  border-color: var(--primary-color);
+}
+
+.lyrics-box details {
+  width: 100%;
+}
+
+.lyrics-box summary {
+  background: linear-gradient(135deg, var(--primary-light), #fffde7);
+  color: var(--text-dark);
+  padding: 15px 20px;
+  font-weight: 900;
+  font-size: 1.05rem;
+  cursor: pointer;
+  outline: none;
+  list-style: none; /* 기본 삼각형 화살표 제거 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  border-radius: 16px;
+}
+
+/* 크롬/사파리 대응용 마커 숨기기 */
+.lyrics-box summary::-webkit-details-marker {
+  display: none;
+}
+
+.lyrics-box summary::after {
+  content: "🎵 가사 펼치기 ▼";
+  font-size: 0.8rem;
+  background-color: #ffffff;
+  color: var(--primary-dark);
+  border: 1px solid var(--primary-color);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.lyrics-box details[open] summary::after {
+  content: "접기 ▲";
+  background-color: var(--primary-dark);
+  color: #ffffff;
+  border-color: var(--primary-dark);
+}
+
+.lyrics-content {
+  padding: 20px;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #34495e;
+  background-color: #fffdf5;
+  border-top: 2px dashed var(--primary-light);
+  max-height: 300px;
+  overflow-y: auto; /* 너무 길어지면 스크롤 */
+  border-radius: 0 0 16px 16px;
+}
+
+.lyrics-verse {
+  margin-bottom: 22px;
+  border-bottom: 1px dashed #f1eee3;
+  padding-bottom: 15px;
+}
+
+.lyrics-verse:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.lyrics-verse h4 {
+  font-size: 1.05rem;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  font-weight: bold;
+  display: inline-block;
+  background-color: var(--primary-light);
+  padding: 2px 10px;
+  border-radius: 8px;
+}
+
+.lyrics-verse p {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #2c3e50;
+  word-break: keep-all;
+  white-space: pre-line; /* 줄바꿈 매끄럽게 처리 */
+  padding-left: 5px;
+}
+
