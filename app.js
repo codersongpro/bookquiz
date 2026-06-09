@@ -13,6 +13,13 @@ let activeDayData = null;        // 현재 일차의 데이터 개체 (읽을거
 let currentShuffledChoices = [];  // 현재 셔플된 객관식 보기 배열
 let currentShuffledAnswerIndex = 0; // 현재 셔플된 보기 중 정답 인덱스
 
+// [추가] 가변적인 퀴즈 진행 및 틀린 문제 추적을 위한 상태 변수
+let currentQuizList = [];         // 현재 진행 중인 퀴즈 목록 (10문제 전체 혹은 오답 모음)
+let currentQuizListIndex = 0;     // 현재 진행 중인 퀴즈 목록에서의 인덱스 (0 ~ N)
+let incorrectQuizIndices = [];    // 지안이가 이번 라운드에서 틀린 문제의 원본 인덱스 번호 리스트
+let isIncorrectOnlyMode = false;  // 지금 '틀린 문제만 다시 풀기'를 하는 중인지 구분하는 상태값
+let correctCount = 0;             // 이번 라운드에서 정답을 맞힌 개수 (점수 계산에 활용)
+
 // 2. DOM 요소 선택 (자주 사용하는 화면 요소를 미리 가져옴)
 const views = {
   home: document.getElementById('home-view'),
@@ -131,9 +138,31 @@ function setupEventListeners() {
     nextQuestion();
   });
 
-  // 결과 화면 -> 다시 풀기 버튼
+  // 결과 화면 -> 지문 다시 읽기 버튼
   document.getElementById('btn-restart-day').addEventListener('click', () => {
     startReading(currentDay);
+  });
+
+  // 결과 화면 -> 퀴즈만 다시 풀기 버튼
+  document.getElementById('btn-restart-quiz').addEventListener('click', () => {
+    startQuiz(); // 바로 1번 문제부터 퀴즈를 다시 시작해요
+  });
+
+  // 결과 화면 -> 틀린 문제만 다시 풀기 버튼
+  document.getElementById('btn-restart-incorrect').addEventListener('click', () => {
+    startIncorrectOnlyQuiz(); // 틀린 문제들만 골라 퀴즈를 다시 시작해요
+  });
+
+  // 퀴즈 진행 중 -> 처음부터 다시 풀기 버튼
+  document.getElementById('btn-quiz-retry').addEventListener('click', () => {
+    const confirmRetry = confirm("퀴즈를 1번 문제부터 다시 시작할까요?");
+    if (confirmRetry) {
+      if (isIncorrectOnlyMode) {
+        startIncorrectOnlyQuiz(); // 오답 도전 모드라면 오답 첫 문제부터 다시 시작해요
+      } else {
+        startQuiz(); // 일반 도전 모드라면 전체 문제 1번부터 다시 시작해요
+      }
+    }
   });
 
   // 결과 화면 -> 홈으로 가기 버튼
@@ -185,9 +214,36 @@ function formatReadingText(text) {
   return text.replace(/'([^']+)'/g, "<strong>'$1'</strong>");
 }
 
-// 9. 2단계: 퀴즈 세션 시작
+// 9. 2단계: 퀴즈 세션 시작 (10문제 전체 도전 모드)
 function startQuiz() {
-  currentQuestionIndex = 0;
+  // 전체 10개 문제 리스트를 진행할 문제 리스트로 복사하여 세팅합니다.
+  currentQuizList = [...activeDayData.quizzes];
+  currentQuizListIndex = 0;
+  incorrectQuizIndices = [];   // 새로운 도전을 위해 오답 기록 리셋
+  isIncorrectOnlyMode = false; // 일반 도전 모드
+  correctCount = 0;            // 정답 맞힌 개수 리셋
+  currentScore = 0;
+
+  // 화면의 점수판 리셋
+  document.getElementById('current-score').innerText = '0';
+
+  showView('quiz');
+  showQuestion();
+}
+
+// [추가] 틀린 문제만 골라서 재도전하는 퀴즈 세션 시작 함수
+function startIncorrectOnlyQuiz() {
+  // 이전 라운드에서 수집된 오답 원본 인덱스들을 찾아 새 문제 목록을 생성합니다.
+  const retryList = [];
+  incorrectQuizIndices.forEach(idx => {
+    retryList.push(activeDayData.quizzes[idx]);
+  });
+
+  currentQuizList = retryList;
+  currentQuizListIndex = 0;
+  incorrectQuizIndices = [];   // 이번 오답 풀기 세션에서 새로 틀릴 오답들을 수집하기 위해 리셋
+  isIncorrectOnlyMode = true;  // 오답 재도전 모드 활성화
+  correctCount = 0;            // 정답 개수 초기화
   currentScore = 0;
 
   // 화면의 점수판 리셋
@@ -199,22 +255,31 @@ function startQuiz() {
 
 // 10. 퀴즈 문제 렌더링
 function showQuestion() {
-  // 현재 문제 정보 가져오기 (매일 10문항 제공)
-  const currentQuiz = activeDayData.quizzes[currentQuestionIndex];
+  // 현재 진행 중인 퀴즈 리스트에서 이번 문제를 추출합니다.
+  const currentQuiz = currentQuizList[currentQuizListIndex];
   
   // 피드백 영역(해설 팝업) 숨기기
   const feedbackCard = document.getElementById('quiz-feedback');
   feedbackCard.style.display = 'none';
   feedbackCard.className = 'quiz-feedback-card'; // 클래스 초기화
 
-  // 문제 진행 진행률 텍스트 및 바 갱신
-  document.getElementById('quiz-progress-text').innerText = `문제 ${currentQuestionIndex + 1} / 10`;
-  const progressPercent = ((currentQuestionIndex + 1) / 10) * 100;
+  // 문제 진행 진행률 텍스트 및 바 갱신 (가변 문제 리스트 길이 대응)
+  const totalQuestions = currentQuizList.length;
+  const progressNum = currentQuizListIndex + 1;
+  
+  if (isIncorrectOnlyMode) {
+    document.getElementById('quiz-progress-text').innerText = `틀린 문제 도전! ${progressNum} / ${totalQuestions}`;
+  } else {
+    document.getElementById('quiz-progress-text').innerText = `문제 ${progressNum} / ${totalQuestions}`;
+  }
+  
+  const progressPercent = (progressNum / totalQuestions) * 100;
   document.getElementById('quiz-progress-fill').style.width = `${progressPercent}%`;
 
-  // 문제 분류 표시 (1~8번은 위인전, 9~10번은 독도)
+  // 문제 분류 표시 (원본 activeDayData.quizzes 내에서의 인덱스로 판정: 1~8번은 위인전, 9~10번은 독도)
+  const originalIdx = activeDayData.quizzes.indexOf(currentQuiz);
   const categoryTag = document.getElementById('quiz-category-tag');
-  if (currentQuestionIndex < 8) {
+  if (originalIdx < 8) {
     categoryTag.innerText = "👑 위인전 문제";
     categoryTag.style.backgroundColor = "var(--primary-dark)";
   } else {
@@ -252,6 +317,8 @@ function showQuestion() {
     choiceButtons.forEach((btn, idx) => {
       btn.innerText = `${idx + 1}. ${currentShuffledChoices[idx]}`;
       btn.className = 'choice-btn'; // 스타일 초기화
+      btn.style.backgroundColor = ''; // 이전 채점 시 적용된 배경색 초기화
+      btn.style.borderColor = '';     // 이전 채점 시 적용된 테두리선 색상 초기화
       btn.disabled = false;         // 버튼 활성화
 
       // 버튼 클릭 시 정답 채점 리스너 연결
@@ -280,9 +347,20 @@ function showQuestion() {
   }
 }
 
+// 점수 실시간 갱신 처리 보조 함수
+function updateScore(isCorrect) {
+  if (isCorrect) {
+    correctCount++;
+  }
+  // 맞힌 비율에 따라 100점 만점으로 스케일링해요
+  currentScore = Math.round((correctCount / currentQuizList.length) * 100);
+  if (currentScore > 100) currentScore = 100;
+  document.getElementById('current-score').innerText = currentScore;
+}
+
 // 11. 객관식 채점 처리
 function checkChoiceAnswer(selectedIndex, clickedButton) {
-  const currentQuiz = activeDayData.quizzes[currentQuestionIndex];
+  const currentQuiz = currentQuizList[currentQuizListIndex];
   const choiceBox = document.getElementById('choice-container');
   const buttons = choiceBox.querySelectorAll('.choice-btn');
 
@@ -298,8 +376,7 @@ function checkChoiceAnswer(selectedIndex, clickedButton) {
     clickedButton.classList.add('selected');
     clickedButton.style.backgroundColor = '#e8f5e9'; // 부드러운 정답 초록색 피드백
     clickedButton.style.borderColor = 'var(--secondary-color)';
-    currentScore += 10; // 10점 추가
-    document.getElementById('current-score').innerText = currentScore;
+    updateScore(true); // 점수 반영
     showFeedback(true, currentQuiz.explanation);
   } else {
     clickedButton.style.backgroundColor = '#ffe9e9'; // 오답 붉은색 피드백
@@ -307,13 +384,20 @@ function checkChoiceAnswer(selectedIndex, clickedButton) {
     // 정답인 버튼도 녹색으로 함께 강조해 줌
     buttons[currentShuffledAnswerIndex].style.borderColor = 'var(--secondary-color)';
     buttons[currentShuffledAnswerIndex].style.backgroundColor = '#e8f5e9';
+    
+    // 이번에 틀린 문제의 원본 인덱스를 수집
+    const originalIdx = activeDayData.quizzes.indexOf(currentQuiz);
+    if (!incorrectQuizIndices.includes(originalIdx)) {
+      incorrectQuizIndices.push(originalIdx);
+    }
+    updateScore(false); // 점수 반영
     showFeedback(false, currentQuiz.explanation);
   }
 }
 
 // 12. 주관식 채점 처리
 function checkShortAnswer() {
-  const currentQuiz = activeDayData.quizzes[currentQuestionIndex];
+  const currentQuiz = currentQuizList[currentQuizListIndex];
   const inputField = document.getElementById('quiz-input-answer');
   const submitBtn = document.getElementById('btn-submit-answer');
   
@@ -335,10 +419,15 @@ function checkShortAnswer() {
   const isCorrect = (cleanUserAnswer === cleanRealAnswer);
 
   if (isCorrect) {
-    currentScore += 10;
-    document.getElementById('current-score').innerText = currentScore;
+    updateScore(true);
     showFeedback(true, currentQuiz.explanation);
   } else {
+    // 이번에 틀린 문제의 원본 인덱스를 수집
+    const originalIdx = activeDayData.quizzes.indexOf(currentQuiz);
+    if (!incorrectQuizIndices.includes(originalIdx)) {
+      incorrectQuizIndices.push(originalIdx);
+    }
+    updateScore(false);
     showFeedback(false, `${currentQuiz.explanation} (정답은 [ ${currentQuiz.answer} ] 입니다)`);
   }
 }
@@ -371,27 +460,41 @@ function showFeedback(isCorrect, explanation) {
 
 // 14. 다음 문제 이동 제어
 function nextQuestion() {
-  currentQuestionIndex++;
+  currentQuizListIndex++;
 
-  if (currentQuestionIndex < 10) {
-    // 아직 풀 문제가 남아있으면 다음 문제로
+  if (currentQuizListIndex < currentQuizList.length) {
+    // 아직 진행할 문제가 남아있으면 다음 문제로 이동합니다.
     showQuestion();
   } else {
-    // 10문제를 전부 다 풀었으면 결과 화면 호출
+    // 해당 라운드의 문제를 모두 풀었으면 결과 화면을 띄웁니다.
     showResult();
   }
 }
 
 // 15. 3단계: 오늘의 골든벨 결과 출력 및 저장
 function showResult() {
-  // 1. 진도 데이터 영구 저장
+  // 1. 진도 데이터 영구 저장 (로컬스토리지)
   ProgressManager.saveProgress(currentDay, currentScore);
 
-  // 2. 점수 텍스트 갱신
-  document.getElementById('result-day-text').innerText = `${currentDay}일차 도전 완료!`;
+  // 2. 결과 화면 텍스트 갱신 (오답 모드와 일반 모드 멘트 구분)
+  if (isIncorrectOnlyMode) {
+    document.getElementById('result-day-text').innerText = `${currentDay}일차 오답 복습 완료!`;
+  } else {
+    document.getElementById('result-day-text').innerText = `${currentDay}일차 도전 완료!`;
+  }
   document.getElementById('result-score-text').innerText = currentScore;
 
-  // 3. 점수대별 칭찬 멘트와 메달 디자인 분기 (초등학생 동기부여용)
+  // 3. 오답 재도전 버튼 표시 여부 분기 제어
+  const retryIncorrectBtn = document.getElementById('btn-restart-incorrect');
+  if (incorrectQuizIndices.length > 0) {
+    // 틀린 문제가 하나라도 남아있다면 복습 버튼을 활성화하여 보여줍니다.
+    retryIncorrectBtn.style.display = 'block';
+  } else {
+    // 오답을 모두 정복했거나 원래 다 맞았다면 오답 재도전 버튼을 숨깁니다.
+    retryIncorrectBtn.style.display = 'none';
+  }
+
+  // 4. 점수대별 칭찬 멘트와 메달 디자인 분기 (초등학생 동기부여용)
   const medalIcon = document.getElementById('result-medal-icon');
   const medalName = document.getElementById('result-medal-name');
   const comment = document.getElementById('result-comment');

@@ -362,6 +362,34 @@ body {
   margin-bottom: 20px;
 }
 
+.quiz-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quiz-retry-btn {
+  background-color: #ffffff;
+  border: 2px solid var(--primary-dark);
+  color: var(--text-dark);
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.quiz-retry-btn:hover {
+  background-color: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.quiz-retry-btn:active {
+  transform: translateY(0);
+}
+
 .quiz-progress-wrapper {
   flex-grow: 1;
   margin-right: 15px;
@@ -691,10 +719,14 @@ body {
   
   .result-actions {
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
   }
   
   .result-actions button {
-    flex: 1;
+    flex: 1 1 calc(50% - 10px);
+    min-width: 140px;
   }
 }
 
