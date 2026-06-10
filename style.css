@@ -339,8 +339,10 @@ body {
   font-size: 1.05rem;
   line-height: 1.8;
   color: #34495e;
-  text-align: justify;
+  /* [수정] 모바일 화면에서 단어 사이 간격이 너무 벌어지지 않도록 left 정렬을 지정하고 글자 잘림을 방지합니다. */
+  text-align: left;
   word-break: keep-all; /* 단어 단위 줄바꿈으로 깔끔하게 */
+  overflow-wrap: break-word; /* 지나치게 긴 낱말이 영역을 넘지 않도록 안전 개행 */
 }
 
 .reading-content strong {
@@ -836,4 +838,49 @@ body {
   white-space: pre-line; /* 줄바꿈 매끄럽게 처리 */
   padding-left: 5px;
 }
+
+/* ==========================================================================
+   13. 스마트폰 모바일 최적화 반응형 스타일 (가독성 및 줄바꿈 향상)
+   ========================================================================== */
+@media (max-width: 480px) {
+  /* 모바일 기기에서는 좌우 테두리를 약간 얇게 하여 더 많은 가로폭 영역을 확보합니다. */
+  #app-container {
+    border-width: 3px;
+  }
+  
+  /* 모바일 여백과 본문 카드 여백을 축소하여 글자가 너무 일찍 개행되지 않도록 돕습니다. */
+  #main-content {
+    padding: 15px 10px;
+  }
+  
+  .reading-card {
+    padding: 16px;
+  }
+  
+  /* 본문 및 제목 글자 크기를 가로폭 비율에 맞춰 최적화하여 좁은 화면에서도 줄 밀림이 없게 만듭니다. */
+  .reading-content {
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  
+  .question-text {
+    font-size: 1.15rem;
+  }
+  
+  .choice-btn {
+    font-size: 0.95rem;
+    padding: 12px 14px;
+  }
+  
+  /* 주관식 입력 행이 좁은 폰 화면에서 밀리거나 깨지지 않도록 수직 배열로 유연하게 전환합니다. */
+  .input-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .input-row button {
+    width: 100%;
+  }
+}
+
 
